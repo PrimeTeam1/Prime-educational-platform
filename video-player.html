@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Video Player</title>
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Jost', sans-serif;
+      overflow-x: hidden; /* ✅ Prevent horizontal scroll */
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 20px;
+      max-width: 100%;
+    }
+
+    .tabs {
+      flex: 1 1 300px;
+      padding: 20px;
+      max-width: 600px;
+    }
+
+    .tabs .tab-buttons {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 10px;
+    }
+
+    .tabs .tab-buttons button {
+      padding: 10px 20px;
+      border: none;
+      background-color: #f0f0f0;
+      cursor: pointer;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+
+    .tabs .tab-buttons button.active {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .tab-content {
+      background: #f9f9f9;
+      border-radius: 10px;
+      padding: 10px;
+      overflow-x: hidden;
+    }
+
+    .tab-content ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .tab-content li {
+      margin: 10px 0;
+    }
+
+    .resource-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
+      padding: 14px 16px;
+      border: 1px solid #ccc;
+      background: #fff;
+      border-radius: 8px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .resource-btn:hover {
+      border-color: #2878eb;
+      box-shadow: 0 8px 20px rgba(40, 120, 235, 0.18);
+      transform: translateY(-1px);
+    }
+
+    .resource-btn i {
+      color: #e63946;
+      min-width: 24px;
+    }
+
+    .mini-reader {
+      margin-top: 12px;
+      display: none;
+    }
+
+    .mini-reader.active {
+      display: block;
+    }
+
+    /* ===============================
+       PREVIEW MODAL SIZE SETTINGS
+       =============================== */
+    .preview-modal {
+      width: 100%;
+      height: min(92vh, calc(100vh - 120px));
+      max-width: 1600px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.12);
+      border: 1px solid #bcd2ff;
+    }
+
+    .mini-reader-header {
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 0 16px;
+      background: #f3f8ff;
+      border-bottom: 1px solid #d9e6ff;
+      font-weight: 600;
+      color: #174389;
+      flex-shrink: 0;
+    }
+
+    .mini-reader-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .mini-reader-open {
+      border: none;
+      background: #e7f0ff;
+      color: #174389;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .mini-reader-back {
+      border: none;
+      background: #2878eb;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .mini-reader-close {
+      border: none;
+      background: #e7f0ff;
+      color: #174389;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .mini-reader-frame {
+      flex: 1;
+      width: 100%;
+      border: none;
+      display: block;
+      background: #fff;
+    }
+
+    .video-section {
+      flex: 1 1 400px;
+      padding: 20px;
+    }
+
+    .video-title {
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+
+    iframe {
+      width: 100%;
+      /* Make embedded Drive/YouTube player controls match full-screen feel */
+      height: clamp(480px, 75vh, 950px);
+      border-radius: 10px;
+      border: none;
+      display: block;
+    }
+
+    .back-wrap {
+      padding: 15px 20px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      color: #ffffff;
+      background: linear-gradient(135deg, #2878eb, #1f63c7);
+      padding: 10px 16px;
+      border-radius: 999px;
+      box-shadow: 0 6px 18px rgba(40, 120, 235, 0.28);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    }
+
+    .back-btn:hover {
+      color: #ffffff;
+      opacity: 0.95;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(40, 120, 235, 0.35);
+    }
+
+    .manage-links-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      color: #174389;
+      background: #eef4ff;
+      border: 1px solid #c9dbff;
+      padding: 9px 14px;
+      border-radius: 999px;
+      transition: all 0.2s ease;
+    }
+
+    .manage-links-btn:hover {
+      border-color: #2878eb;
+      color: #174389;
+      box-shadow: 0 8px 20px rgba(40, 120, 235, 0.18);
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        padding: 10px;
+      }
+
+      .tabs, .video-section {
+        padding: 10px;
+      }
+
+      iframe {
+        height: clamp(260px, 45vh, 560px);
+      }
+
+      .tabs .tab-buttons {
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .preview-modal {
+        width: 100%;
+        height: 100vh;
+        border-radius: 0;
+        border: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="back-wrap">
+    <a href="course-content-math-est-1.html" class="back-btn" id="backToCourseContent">
+      <i class="fas fa-arrow-left" aria-hidden="true"></i>
+      <span>Back to Course Content</span>
+    </a>
+  </div>
+
+  <div class="container">
+    <!-- Tabs Section -->
+    <div class="tabs">
+      <div id="choicesPanel">
+        <div class="tab-buttons">
+          <button class="tab-btn active" type="button" onclick="showTab(event, 'pdfs')">PDFs</button>
+          <button class="tab-btn" type="button" onclick="showTab(event, 'materials')">Materials</button>
+          <button class="tab-btn" type="button" onclick="showTab(event, 'quizzes')">Quizzes</button>
+        </div>
+
+        <div id="pdfs" class="tab-content">
+          <h3>📄 PDFs & Documents</h3>
+          <ul id="pdfsList"></ul>
+        </div>
+
+        <div id="materials" class="tab-content" style="display: none;">
+          <h3>📚 Materials</h3>
+          <ul id="materialsList"></ul>
+        </div>
+
+        <div id="quizzes" class="tab-content" style="display: none;">
+          <h3>📝 Quizzes</h3>
+          <ul id="quizzesList"></ul>
+        </div>
+      </div>
+
+      <div id="miniReader" class="mini-reader" aria-live="polite">
+        <div class="preview-modal">
+          <div class="mini-reader-header">
+            <span id="miniReaderTitle">Resource Viewer</span>
+            <div class="mini-reader-actions">
+              <button class="mini-reader-back" type="button" onclick="backToChoices()">Back</button>
+              <a id="miniReaderOpenNew" class="mini-reader-open" href="#" target="_blank" rel="noopener">Open New Tab</a>
+              <button class="mini-reader-close" type="button" onclick="closeMiniReader()" aria-label="Close viewer">&times;</button>
+            </div>
+          </div>
+          <div id="miniReaderMessage" style="display: none; padding: 20px; text-align: center; color: #174389; font-weight: 600;">
+            No preview link added yet.
+          </div>
+          <iframe id="miniReaderFrame" class="mini-reader-frame" src="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <!-- Video Section -->
+    <div class="video-section">
+      <div class="video-title" id="mainVideoTitle">▶️ Video Player</div>
+      <iframe
+        id="mainVideoFrame"
+        src=""
+        allow="autoplay; encrypted-media; picture-in-picture"
+        allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <script>
+    var allLessonKeys = [
+      'linear-equations', 'Exponents and Radical', 'polynomial-functions', 'systems-equations',
+      'rational-expressions', 'exponential-logarithmic', 'complex-numbers', 'word-problems',
+      'function-notation', 'domain-range', 'linear-functions', 'quadratic-functions',
+      'polynomial-functions-graph', 'rational-functions', 'function-transformations', 'inverse-functions',
+      'right-triangle-trig', 'unit-circle', 'trig-identities', 'law-sines-cosines',
+      'graphing-sine-cosine', 'inverse-trig-functions', 'trig-equations', 'trig-applications',
+      'central-tendency', 'variability', 'data-visualization', 'normal-distribution',
+      'basic-probability', 'conditional-probability', 'binomial-distribution', 'hypothesis-testing',
+      'triangle-properties', 'circles-arcs', 'polygons-quadrilaterals', 'similarity-congruence',
+      'coordinate-geometry', '3d-geometry', 'surface-area-volume', 'geometric-proofs',
+      'limits-continuity', 'derivative-definition', 'power-product-rule', 'chain-rule',
+      'derivative-applications', 'optimization-problems', 'introduction-integration', 'fundamental-theorem'
+    ];
+
+    function buildEmptyLessonConfig(lessonKey) {
+      return {
+        resourceLinks: {
+          // ===============================
+          // EDIT YOUR PDF LINKS HERE
+          // ===============================
+          pdfs: {
+            'lesson-notes-chapter-1': '',
+            'practice-problems': '',
+            'summary-sheet': ''
+          },
+          // ===============================
+          // EDIT YOUR MATERIAL LINKS HERE
+          // ===============================
+          materials: {
+            'material-1': '',
+            'material-2': ''
+          },
+          // ===============================
+          // EDIT YOUR QUIZ LINKS HERE
+          // ===============================
+          quizzes: {
+            'quiz-1': '',
+            'quiz-2': ''
+          }
+        },
+        resources: {
+          pdfs: [
+            { id: lessonKey + '-lesson-notes-chapter-1', title: 'Lesson Notes - Chapter 1', type: 'pdfs', linkKey: 'lesson-notes-chapter-1', icon: 'fas fa-file-pdf' },
+            { id: lessonKey + '-practice-problems', title: 'Practice Problems', type: 'pdfs', linkKey: 'practice-problems', icon: 'fas fa-file-pdf' },
+            { id: lessonKey + '-summary-sheet', title: 'Summary Sheet', type: 'pdfs', linkKey: 'summary-sheet', icon: 'fas fa-file-pdf' }
+          ],
+          materials: [
+            { id: lessonKey + '-material-1', title: 'Material 1', type: 'materials', linkKey: 'material-1', icon: 'fas fa-file-alt' },
+            { id: lessonKey + '-material-2', title: 'Material 2', type: 'materials', linkKey: 'material-2', icon: 'fas fa-link' }
+          ],
+          quizzes: [
+            { id: lessonKey + '-quiz-1', title: 'Quiz 1', type: 'quizzes', linkKey: 'quiz-1', icon: 'fas fa-question-circle' },
+            { id: lessonKey + '-quiz-2', title: 'Quiz 2', type: 'quizzes', linkKey: 'quiz-2', icon: 'fas fa-question-circle' }
+          ]
+        }
+      };
+    }
+
+    function createEmptyLinksConfig() {
+      return {
+        // ===============================
+        // EDIT YOUR PDF LINKS HERE
+        // ===============================
+        pdfs: {
+          'lesson-notes-chapter-1': '',
+          'practice-problems': '',
+          'summary-sheet': ''
+        },
+        // ===============================
+        // EDIT YOUR MATERIAL LINKS HERE
+        // ===============================
+        materials: {
+          'material-1': '',
+          'material-2': ''
+        },
+        // ===============================
+        // EDIT YOUR QUIZ LINKS HERE
+        // ===============================
+        quizzes: {
+          'quiz-1': '',
+          'quiz-2': ''
+        }
+      };
+    }
+
+    // ===============================
+    // EDIT LINKS PER LESSON (ALL 48)
+    // ===============================
+    var lessonResourceLinks = {
+      "systems-equations": {
+        pdfs: {
+          'lesson-notes-chapter-1': 'https://drive.google.com/file/d/1Y-9B4qVbpl_by5TVdPKI3bfbaXXPGURf/view?usp=drive_open',
+          'practice-problems': '',
+          'summary-sheet': ''
+        },
+        materials: { 'material-1': '', 'material-2': '' },
+        quizzes: { 'quiz-1': '', 'quiz-2': '' }
+      },
+      'polynomial-functions': {
+        pdfs: {
+          'lesson-notes-chapter-1': '',
+          'practice-problems': 'https://drive.google.com/file/d/1Y-9B4qVbpl_by5TVdPKI3bfbaXXPGURf/view?usp=drive_open',
+          'summary-sheet': ''
+        },
+        materials: { 'material-1': '', 'material-2': '' },
+        quizzes: { 'quiz-1': '', 'quiz-2': '' }
+      },
+      'Exponents and Radical': {
+        pdfs: {
+          'lesson-notes-chapter-1': 'https://drive.google.com/file/d/1Y-9B4qVbpl_by5TVdPKI3bfbaXXPGURf/view?usp=drive_open',
+          'practice-problems': '',
+          'summary-sheet': ''
+        },
+        materials: { 'material-1': '', 'material-2': '' },
+        quizzes: { 'quiz-1': '', 'quiz-2': '' }
+      },
+      'linear-equations': {
+        pdfs: {
+          'lesson-notes-chapter-1': 'https://drive.google.com/file/d/1Y-9B4qVbpl_by5TVdPKI3bfbaXXPGURf/view?usp=drive_open',
+          'practice-problems': '',
+          'summary-sheet': ''
+        },
+        materials: { 'material-1': '', 'material-2': '' },
+        quizzes: { 'quiz-1': '', 'quiz-2': '' }
+      },
+      'rational-expressions': createEmptyLinksConfig(),
+      'exponential-logarithmic': createEmptyLinksConfig(),
+      'complex-numbers': createEmptyLinksConfig(),
+      'word-problems': createEmptyLinksConfig(),
+      'function-notation': createEmptyLinksConfig(),
+      'domain-range': createEmptyLinksConfig(),
+      'linear-functions': createEmptyLinksConfig(),
+      'quadratic-functions': createEmptyLinksConfig(),
+      'polynomial-functions-graph': createEmptyLinksConfig(),
+      'rational-functions': createEmptyLinksConfig(),
+      'function-transformations': createEmptyLinksConfig(),
+      'inverse-functions': createEmptyLinksConfig(),
+      'right-triangle-trig': createEmptyLinksConfig(),
+      'unit-circle': createEmptyLinksConfig(),
+      'trig-identities': createEmptyLinksConfig(),
+      'law-sines-cosines': createEmptyLinksConfig(),
+      'graphing-sine-cosine': createEmptyLinksConfig(),
+      'inverse-trig-functions': createEmptyLinksConfig(),
+      'trig-equations': createEmptyLinksConfig(),
+      'trig-applications': createEmptyLinksConfig(),
+      'central-tendency': createEmptyLinksConfig(),
+      'variability': createEmptyLinksConfig(),
+      'data-visualization': createEmptyLinksConfig(),
+      'normal-distribution': createEmptyLinksConfig(),
+      'basic-probability': createEmptyLinksConfig(),
+      'conditional-probability': createEmptyLinksConfig(),
+      'binomial-distribution': createEmptyLinksConfig(),
+      'hypothesis-testing': createEmptyLinksConfig(),
+      'triangle-properties': createEmptyLinksConfig(),
+      'circles-arcs': createEmptyLinksConfig(),
+      'polygons-quadrilaterals': createEmptyLinksConfig(),
+      'similarity-congruence': createEmptyLinksConfig(),
+      'coordinate-geometry': createEmptyLinksConfig(),
+      '3d-geometry': createEmptyLinksConfig(),
+      'surface-area-volume': createEmptyLinksConfig(),
+      'geometric-proofs': createEmptyLinksConfig(),
+      'limits-continuity': createEmptyLinksConfig(),
+      'derivative-definition': createEmptyLinksConfig(),
+      'power-product-rule': createEmptyLinksConfig(),
+      'chain-rule': createEmptyLinksConfig(),
+      'derivative-applications': createEmptyLinksConfig(),
+      'optimization-problems': createEmptyLinksConfig(),
+      'introduction-integration': createEmptyLinksConfig(),
+      'fundamental-theorem': createEmptyLinksConfig()
+    };
+
+    // Build per-lesson viewer config (cards + links).
+    var lessonResourceConfigs = {};
+    allLessonKeys.forEach(function(lessonKey) {
+      var lessonConfig = buildEmptyLessonConfig(lessonKey);
+      lessonConfig.resourceLinks = lessonResourceLinks[lessonKey] || createEmptyLinksConfig();
+      lessonResourceConfigs[lessonKey] = lessonConfig;
+    });
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+    var currentLessonKey = '';
+
+    function getCurrentLessonConfig() {
+      return lessonResourceConfigs[currentLessonKey] || buildEmptyLessonConfig(currentLessonKey || 'default-lesson');
+    }
+
+    function getResourceUrl(resource) {
+      if (!resource || !resource.type || !resource.linkKey) return '';
+      var lessonConfig = getCurrentLessonConfig();
+      var categoryLinks = lessonConfig.resourceLinks[resource.type] || {};
+      return categoryLinks[resource.linkKey] || '';
+    }
+
+
+    (function setBackTarget() {
+      var backLink = document.getElementById('backToCourseContent');
+      if (!backLink) return;
+
+      // If user came from a course content page, return there.
+      var ref = document.referrer || '';
+      if (/course-content-[^/]+\.html/i.test(ref)) {
+        backLink.href = ref;
+      }
+    })();
+
+    function showTab(event, tabId) {
+      document.querySelectorAll('.tab-content').forEach(function(el) {
+        el.style.display = 'none';
+      });
+      document.querySelectorAll('.tab-btn').forEach(function(btn) {
+        btn.classList.remove('active');
+      });
+
+      document.getElementById(tabId).style.display = 'block';
+      if (event && event.currentTarget) {
+        event.currentTarget.classList.add('active');
+      }
+    }
+
+    function renderResourceList(category) {
+      var listEl = document.getElementById(category + 'List');
+      if (!listEl) return;
+
+      listEl.innerHTML = '';
+      var lessonConfig = getCurrentLessonConfig();
+      (lessonConfig.resources[category] || []).forEach(function(resource) {
+        var item = document.createElement('li');
+        var button = document.createElement('button');
+        var icon = document.createElement('i');
+
+        button.className = 'resource-btn';
+        button.type = 'button';
+        button.setAttribute('data-id', resource.id);
+        button.setAttribute('data-type', resource.type);
+        button.setAttribute('data-link-key', resource.linkKey);
+
+        icon.className = resource.icon;
+        button.appendChild(icon);
+        button.appendChild(document.createTextNode(' ' + resource.title));
+        button.addEventListener('click', function() {
+          openResourceMiniWindow(resource);
+        });
+
+        item.appendChild(button);
+        listEl.appendChild(item);
+      });
+    }
+
+    function renderResources() {
+      renderResourceList('pdfs');
+      renderResourceList('materials');
+      renderResourceList('quizzes');
+    }
+
+    function isValidResourceLink(url) {
+      return typeof url === 'string' && /^https?:\/\//i.test(url.trim());
+    }
+
+    function normalizeEmbedUrl(rawUrl) {
+      if (!rawUrl) return '';
+      var url = rawUrl.trim();
+
+      // YouTube watch/share -> embed
+      if (url.indexOf('youtube.com/watch') !== -1) {
+        var videoId = (url.split('v=')[1] || '').split('&')[0];
+        if (videoId) return 'https://www.youtube.com/embed/' + videoId;
+      }
+      if (url.indexOf('youtu.be/') !== -1) {
+        var shortId = (url.split('youtu.be/')[1] || '').split('?')[0];
+        if (shortId) return 'https://www.youtube.com/embed/' + shortId;
+      }
+
+      // Google Drive file URL -> preview
+      if (url.indexOf('drive.google.com/file/d/') !== -1) {
+        var fileId = (url.split('/d/')[1] || '').split('/')[0];
+        if (fileId) return 'https://drive.google.com/file/d/' + fileId + '/preview';
+      }
+
+      return url;
+    }
+
+    function openResourceMiniWindow(resource) {
+      var url = getResourceUrl(resource);
+      var title = resource && resource.title ? resource.title : 'Resource Viewer';
+      var reader = document.getElementById('miniReader');
+      var frame = document.getElementById('miniReaderFrame');
+      var titleEl = document.getElementById('miniReaderTitle');
+      var openNewTabEl = document.getElementById('miniReaderOpenNew');
+      var messageEl = document.getElementById('miniReaderMessage');
+
+      var hasValidLink = isValidResourceLink(url);
+      var embeddedUrl = hasValidLink ? normalizeEmbedUrl(url) : '';
+
+      titleEl.textContent = title;
+      openNewTabEl.href = hasValidLink ? url : '#';
+      openNewTabEl.style.pointerEvents = hasValidLink ? 'auto' : 'none';
+      openNewTabEl.style.opacity = hasValidLink ? '1' : '0.6';
+
+      if (hasValidLink && embeddedUrl) {
+        frame.style.display = 'block';
+        frame.src = embeddedUrl;
+        messageEl.style.display = 'none';
+      } else {
+        frame.style.display = 'none';
+        frame.src = '';
+        messageEl.textContent = 'No preview link added yet.';
+        messageEl.style.display = 'block';
+      }
+
+      document.getElementById('choicesPanel').style.display = 'none';
+      reader.classList.add('active');
+    }
+
+    function backToChoices() {
+      closeMiniReader();
+    }
+
+    function closeMiniReader() {
+      var reader = document.getElementById('miniReader');
+      var frame = document.getElementById('miniReaderFrame');
+      var messageEl = document.getElementById('miniReaderMessage');
+      frame.src = '';
+      frame.style.display = 'block';
+      messageEl.style.display = 'none';
+      reader.classList.remove('active');
+      document.getElementById('choicesPanel').style.display = 'block';
+    }
+
+    // Load main video passed from index.html:
+    // video-player.html?video=<youtube_or_drive_url>&title=<optional_title>&lesson=<lesson_key>
+    function loadMainVideoFromQuery() {
+      var params = new URLSearchParams(window.location.search);
+      var rawVideoUrl = (params.get('video') || '').trim();
+      var rawTitle = (params.get('title') || '').trim();
+      var lessonParam = (params.get('lesson') || '').trim();
+
+      currentLessonKey = lessonParam;
+
+      var titleEl = document.getElementById('mainVideoTitle');
+      if (rawTitle && titleEl) titleEl.textContent = '▶️ ' + rawTitle;
+
+      var frame = document.getElementById('mainVideoFrame');
+      if (!frame) return;
+
+      if (!rawVideoUrl) {
+        // Keep the iframe empty if no URL is provided.
+        return;
+      }
+
+      var embeddedUrl = normalizeEmbedUrl(rawVideoUrl);
+      frame.src = embeddedUrl;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      loadMainVideoFromQuery();
+      renderResources();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Link Manager</title>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Jost', sans-serif;
+      background: #f3f6fb;
+      color: #1d2b4f;
+    }
+    .wrap {
+      max-width: 900px;
+      margin: 28px auto;
+      padding: 0 16px 32px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 12px 30px rgba(15, 37, 78, 0.1);
+      padding: 18px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 1.6rem;
+    }
+    .desc {
+      margin: 0 0 18px;
+      color: #455b8f;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .item label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .item input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #c9d8f6;
+      font-size: 0.95rem;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .btn {
+      border: none;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: #2878eb;
+      color: #fff;
+    }
+    .btn-secondary {
+      background: #eaf1ff;
+      color: #174389;
+      border: 1px solid #c9d8f6;
+    }
+    .msg {
+      margin-top: 10px;
+      font-weight: 600;
+      color: #1d7a30;
+      min-height: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Video Player Link Manager</h1>
+      <p class="desc">Update links once, click Save, and they apply immediately in the video player.</p>
+
+      <div class="grid" id="fieldsContainer"></div>
+
+      <div class="actions">
+        <button class="btn btn-primary" type="button" onclick="saveLinks()">Save Links</button>
+        <button class="btn btn-secondary" type="button" onclick="resetDefaults()">Reset Defaults</button>
+      </div>
+      <div class="msg" id="statusMsg"></div>
+    </div>
+  </div>
+
+  <script>
+    var STORAGE_KEY = 'video_player_resource_links_v1';
+    var fields = [
+      { id: 'lesson-notes', label: 'Lesson Notes - Chapter 1' },
+      { id: 'practice-problems', label: 'Practice Problems' },
+      { id: 'summary-sheet', label: 'Summary Sheet' },
+      { id: 'presentation-slides', label: 'Presentation Slides' },
+      { id: 'reference-links', label: 'Reference Links' },
+      { id: 'quiz-1', label: 'Quiz 1' },
+      { id: 'quiz-2', label: 'Quiz 2' }
+    ];
+
+    function getDefaultLinks() {
+      return {
+        'lesson-notes': 'https://example.com/lesson-notes',
+        'practice-problems': 'https://example.com/practice-problems',
+        'summary-sheet': 'https://example.com/summary-sheet',
+        'presentation-slides': 'https://example.com/presentation-slides',
+        'reference-links': 'https://example.com/reference-links',
+        'quiz-1': 'https://example.com/quiz-1',
+        'quiz-2': 'https://example.com/quiz-2'
+      };
+    }
+
+    function loadLinks() {
+      try {
+        var raw = localStorage.getItem(STORAGE_KEY);
+        var parsed = raw ? JSON.parse(raw) : {};
+        return Object.assign({}, getDefaultLinks(), parsed);
+      } catch (err) {
+        return getDefaultLinks();
+      }
+    }
+
+    function renderFields() {
+      var container = document.getElementById('fieldsContainer');
+      var links = loadLinks();
+      container.innerHTML = fields.map(function(f) {
+        var val = links[f.id] || '';
+        return '<div class="item">' +
+          '<label for="' + f.id + '">' + f.label + '</label>' +
+          '<input id="' + f.id + '" type="url" placeholder="https://..." value="' + escapeHtml(val) + '">' +
+          '</div>';
+      }).join('');
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function saveLinks() {
+      var result = {};
+      fields.forEach(function(f) {
+        result[f.id] = (document.getElementById(f.id).value || '').trim();
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(result));
+      document.getElementById('statusMsg').textContent = 'Saved. Links applied to video player.';
+    }
+
+    function resetDefaults() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(getDefaultLinks()));
+      renderFields();
+      document.getElementById('statusMsg').textContent = 'Reset to defaults.';
+    }
+
+    renderFields();
+  </script>
+</body>
+</html>
