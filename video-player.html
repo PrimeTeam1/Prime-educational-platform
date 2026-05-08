@@ -6,8 +6,26 @@
   <title>Video Player</title>
 
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
   <style>
+    /* ===============================
+       BLACKBOOK PREMIUM THEME
+       Edit colors here
+    ================================ */
+    :root {
+      --bb-black: #0b0b0d;
+      --bb-dark: #111114;
+      --bb-deep: #151518;
+      --bb-gold: #c9a227;
+      --bb-gold-soft: #b8921f;
+      --bb-gold-muted: #d4af37;
+      --bb-white: #f1f1f1;
+      --bb-gray: #bdbdbd;
+    }
+
+    /* ===============================
+       EYE COMFORT SETTINGS
+    ================================ */
     * {
       box-sizing: border-box;
     }
@@ -17,18 +35,155 @@
       padding: 0;
       font-family: 'Jost', sans-serif;
       overflow-x: hidden; /* ✅ Prevent horizontal scroll */
+      background: linear-gradient(180deg, var(--bb-black) 0%, var(--bb-dark) 100%);
+      color: var(--bb-white);
+      line-height: 1.66;
+    }
+
+    body {
+      min-height: 100vh;
+      position: relative;
+    }
+
+    body::before {
+      content: "x² + y² = r²   a² + b² = c²   f(x)=ax²+bx+c   sin²θ + cos²θ = 1   π";
+      position: fixed;
+      right: 3%;
+      top: 14%;
+      width: min(34vw, 480px);
+      font-family: 'Montserrat', 'Jost', sans-serif;
+      font-size: clamp(0.94rem, 1.65vw, 1.2rem);
+      line-height: 2;
+      letter-spacing: 2px;
+      color: rgba(201, 162, 39, 0.08);
+      pointer-events: none;
+      z-index: 0;
+      text-align: right;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(circle at 92% 6%, rgba(201, 162, 39, 0.12) 0 1px, transparent 1px 100%),
+        linear-gradient(135deg, transparent 0 93.4%, rgba(201, 162, 39, 0.12) 93.4% 93.52%, transparent 93.52% 100%),
+        linear-gradient(315deg, transparent 0 94.2%, rgba(201, 162, 39, 0.11) 94.2% 94.32%, transparent 94.32% 100%);
+      background-size: 34px 34px, 100% 100%, 100% 100%;
+      opacity: 0.12;
+      mix-blend-mode: screen;
+    }
+
+    /* ===============================
+       PREMIUM NAVBAR
+    ================================ */
+    .navbar,
+    .top-contact-bar {
+      max-width: 1340px;
+      margin: 8px auto 6px;
+      padding: 9px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-bottom: 1px solid rgba(212, 175, 55, 0.24);
+      border-radius: 12px;
+      background: rgba(10, 10, 16, 0.84);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.32);
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      overflow: hidden;
+    }
+
+    .top-contact-bar::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(212, 175, 55, 0.06) 50%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .contact-links,
+    .social-links {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: relative;
+      z-index: 1;
+      flex-wrap: wrap;
+    }
+
+    .navbar a,
+    .contact-item,
+    .social-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #e8e8e8;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.94rem;
+      letter-spacing: 0.2px;
+      transition: color 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+      opacity: 0.92;
+    }
+
+    .contact-item i {
+      color: rgba(212, 175, 55, 0.95);
+      font-size: 0.88rem;
+    }
+
+    .navbar a:hover,
+    .navbar a.active,
+    .contact-item:hover,
+    .social-item:hover {
+      color: #d4af37;
+      opacity: 1;
+      transform: translateY(-1px);
+    }
+
+    .contact-divider {
+      width: 1px;
+      height: 18px;
+      background: rgba(212, 175, 55, 0.28);
+      margin: 0 2px;
+    }
+
+    .social-item {
+      width: 30px;
+      height: 30px;
+      justify-content: center;
+      border-radius: 50%;
+      border: 1px solid rgba(212, 175, 55, 0.22);
+      color: #e7e7e7;
+      background: rgba(255, 255, 255, 0.03);
+      font-size: 0.82rem;
+    }
+
+    .social-item:hover {
+      background: rgba(212, 175, 55, 0.1);
+      border-color: rgba(212, 175, 55, 0.45);
+      color: #f5c95a;
     }
 
     .container {
       display: flex;
       flex-wrap: wrap;
-      padding: 20px;
+      padding: 26px;
       max-width: 100%;
+      position: relative;
+      z-index: 1;
+      gap: 8px 0;
     }
 
     .tabs {
       flex: 1 1 300px;
-      padding: 20px;
+      padding: 22px;
       max-width: 600px;
     }
 
@@ -40,23 +195,45 @@
 
     .tabs .tab-buttons button {
       padding: 10px 20px;
-      border: none;
-      background-color: #f0f0f0;
+      border: 1px solid rgba(245, 196, 0, 0.68);
+      background: var(--bb-black);
+      color: var(--bb-gold);
       cursor: pointer;
-      border-radius: 5px;
+      border-radius: 999px;
       font-weight: bold;
+      letter-spacing: 1px;
+      transition: all 0.22s ease;
+      box-shadow: none;
+    }
+
+    .tabs .tab-buttons button:hover {
+      background: var(--bb-gold);
+      color: #060606;
+      box-shadow: 0 0 10px rgba(201, 162, 39, 0.15);
     }
 
     .tabs .tab-buttons button.active {
-      background-color: #007bff;
-      color: white;
+      background: var(--bb-gold);
+      color: #060606;
+      border-color: var(--bb-gold);
+      box-shadow: 0 0 10px rgba(201, 162, 39, 0.15);
     }
 
     .tab-content {
-      background: #f9f9f9;
+      background: rgba(255,255,255,0.02);
       border-radius: 10px;
-      padding: 10px;
+      padding: 12px;
       overflow-x: hidden;
+      border: 1px solid rgba(212,175,55,0.35);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.28);
+      backdrop-filter: blur(6px);
+    }
+
+    .tab-content h3 {
+      margin: 6px 0 14px;
+      color: var(--bb-white);
+      font-family: 'Montserrat', 'Jost', sans-serif;
+      letter-spacing: 1.5px;
     }
 
     .tab-content ul {
@@ -72,28 +249,93 @@
       width: 100%;
       display: flex;
       align-items: center;
-      gap: 10px;
+      justify-content: space-between;
+      gap: 12px;
       margin: 0;
       padding: 14px 16px;
-      border: 1px solid #ccc;
-      background: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--bb-white);
       border-radius: 8px;
       font-size: 1.05rem;
       font-weight: 600;
       text-align: left;
       cursor: pointer;
-      transition: all 0.2s ease;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
     }
 
     .resource-btn:hover {
-      border-color: #2878eb;
-      box-shadow: 0 8px 20px rgba(40, 120, 235, 0.18);
-      transform: translateY(-1px);
+      border-color: rgba(212, 175, 55, 0.42);
+      box-shadow: 0 14px 24px rgba(0, 0, 0, 0.3);
+      background: rgba(255, 255, 255, 0.05);
+      transform: translateY(-2px);
+    }
+
+    .resource-main {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .resource-title {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .resource-btn i {
-      color: #e63946;
+      color: var(--bb-gold);
       min-width: 24px;
+    }
+
+    /* ===============================
+       PREMIUM MODULE COLORS
+    ================================ */
+    .module-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      border: 1px solid transparent;
+      margin-left: auto;
+    }
+
+    .module-badge.overview {
+      background: rgba(150, 32, 32, 0.18);
+      color: #ffb3b3;
+      border-color: rgba(190, 55, 55, 0.45);
+    }
+
+    .module-badge.assignment {
+      background: rgba(28, 120, 75, 0.18);
+      color: #a8f0c6;
+      border-color: rgba(70, 180, 120, 0.45);
+    }
+
+    .module-badge.video {
+      background: rgba(212, 175, 55, 0.16);
+      color: #e6c96a;
+      border-color: rgba(212, 175, 55, 0.4);
+    }
+
+    .module-badge.quiz {
+      background: rgba(120, 80, 180, 0.18);
+      color: #d8c4ff;
+      border-color: rgba(150, 110, 220, 0.45);
+    }
+
+    .module-badge.pdf {
+      background: rgba(55, 105, 180, 0.18);
+      color: #bcd8ff;
+      border-color: rgba(80, 135, 220, 0.45);
     }
 
     .mini-reader {
@@ -117,9 +359,9 @@
       flex-direction: column;
       border-radius: 12px;
       overflow: hidden;
-      background: #fff;
-      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.12);
-      border: 1px solid #bcd2ff;
+      background: #0a0a0a;
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(245, 196, 0, 0.52);
     }
 
     .mini-reader-header {
@@ -129,10 +371,10 @@
       justify-content: space-between;
       gap: 10px;
       padding: 0 16px;
-      background: #f3f8ff;
-      border-bottom: 1px solid #d9e6ff;
+      background: #111111;
+      border-bottom: 1px solid rgba(245, 196, 0, 0.38);
       font-weight: 600;
-      color: #174389;
+      color: var(--bb-white);
       flex-shrink: 0;
     }
 
@@ -143,38 +385,56 @@
     }
 
     .mini-reader-open {
-      border: none;
-      background: #e7f0ff;
-      color: #174389;
+      border: 1px solid rgba(245, 196, 0, 0.6);
+      background: #070707;
+      color: var(--bb-gold);
       padding: 6px 10px;
       border-radius: 6px;
       cursor: pointer;
       font-size: 0.85rem;
       font-weight: 600;
       text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .mini-reader-open:hover {
+      background: var(--bb-gold);
+      color: #050505;
     }
 
     .mini-reader-back {
-      border: none;
-      background: #2878eb;
-      color: #fff;
+      border: 1px solid rgba(245, 196, 0, 0.65);
+      background: #060606;
+      color: var(--bb-gold);
       padding: 6px 10px;
       border-radius: 6px;
       cursor: pointer;
       font-size: 0.9rem;
       font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .mini-reader-back:hover {
+      background: var(--bb-gold);
+      color: #050505;
     }
 
     .mini-reader-close {
-      border: none;
-      background: #e7f0ff;
-      color: #174389;
+      border: 1px solid rgba(245, 196, 0, 0.6);
+      background: #070707;
+      color: var(--bb-gold);
       width: 28px;
       height: 28px;
       border-radius: 6px;
       cursor: pointer;
       font-size: 18px;
       line-height: 1;
+      transition: all 0.2s ease;
+    }
+
+    .mini-reader-close:hover {
+      background: var(--bb-gold);
+      color: #050505;
     }
 
     .mini-reader-frame {
@@ -182,17 +442,20 @@
       width: 100%;
       border: none;
       display: block;
-      background: #fff;
+      background: #000;
     }
 
     .video-section {
       flex: 1 1 400px;
-      padding: 20px;
+      padding: 22px;
     }
 
     .video-title {
-      font-size: 1.2em;
+      font-family: 'Montserrat', 'Jost', sans-serif;
+      font-size: 1.28em;
       margin-bottom: 10px;
+      color: var(--bb-white);
+      letter-spacing: 1.4px;
     }
 
     iframe {
@@ -200,8 +463,9 @@
       /* Make embedded Drive/YouTube player controls match full-screen feel */
       height: clamp(480px, 75vh, 950px);
       border-radius: 10px;
-      border: none;
+      border: 1px solid rgba(245, 196, 0, 0.42);
       display: block;
+      box-shadow: 0 0 0 rgba(245, 196, 0, 0), 0 18px 34px rgba(0, 0, 0, 0.5);
     }
 
     .back-wrap {
@@ -211,6 +475,8 @@
       justify-content: space-between;
       gap: 12px;
       flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
     }
 
     .back-btn {
@@ -219,19 +485,21 @@
       gap: 8px;
       text-decoration: none;
       font-weight: 600;
-      color: #ffffff;
-      background: linear-gradient(135deg, #2878eb, #1f63c7);
+      color: var(--bb-gold);
+      background: #070707;
+      border: 1px solid rgba(245, 196, 0, 0.7);
       padding: 10px 16px;
       border-radius: 999px;
-      box-shadow: 0 6px 18px rgba(40, 120, 235, 0.28);
+      box-shadow: none;
       transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
     }
 
     .back-btn:hover {
-      color: #ffffff;
-      opacity: 0.95;
+      color: #070707;
+      background: var(--bb-gold);
+      opacity: 1;
       transform: translateY(-1px);
-      box-shadow: 0 10px 24px rgba(40, 120, 235, 0.35);
+      box-shadow: 0 0 10px rgba(201, 162, 39, 0.15);
     }
 
     .manage-links-btn {
@@ -240,22 +508,66 @@
       gap: 8px;
       text-decoration: none;
       font-weight: 600;
-      color: #174389;
-      background: #eef4ff;
-      border: 1px solid #c9dbff;
+      color: var(--bb-gold);
+      background: #0a0a0a;
+      border: 1px solid rgba(245, 196, 0, 0.6);
       padding: 9px 14px;
       border-radius: 999px;
       transition: all 0.2s ease;
     }
 
     .manage-links-btn:hover {
-      border-color: #2878eb;
-      color: #174389;
-      box-shadow: 0 8px 20px rgba(40, 120, 235, 0.18);
+      background: var(--bb-gold);
+      border-color: var(--bb-gold);
+      color: #060606;
+      box-shadow: 0 0 10px rgba(201, 162, 39, 0.15);
       transform: translateY(-1px);
     }
 
     @media (max-width: 768px) {
+      body::before {
+        width: 86vw;
+        right: 4%;
+        top: 9%;
+        font-size: 0.86rem;
+        line-height: 1.9;
+      }
+
+      .top-contact-bar {
+        margin: 8px 10px 4px;
+        padding: 10px 12px;
+        gap: 10px;
+        border-radius: 10px;
+      }
+
+      .contact-links {
+        gap: 10px;
+      }
+
+      .contact-item {
+        font-size: 0.86rem;
+      }
+
+      .contact-divider {
+        display: none;
+      }
+
+      .social-links {
+        width: 100%;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+
+      .resource-btn {
+        font-size: 0.98rem;
+        padding: 12px 14px;
+      }
+
+      .module-badge {
+        font-size: 0.68rem;
+        padding: 3px 8px;
+      }
+
       .container {
         flex-direction: column;
         padding: 10px;
@@ -278,12 +590,33 @@
         width: 100%;
         height: 100vh;
         border-radius: 0;
-        border: none;
+        border: 1px solid rgba(245, 196, 0, 0.32);
       }
     }
   </style>
 </head>
 <body>
+
+  <div class="top-contact-bar navbar" aria-label="Contact and social links">
+    <div class="contact-links">
+      <a class="contact-item" href="tel:+201034084332">
+        <i class="fas fa-phone-alt" aria-hidden="true"></i>
+        <span>+201034084332</span>
+      </a>
+      <span class="contact-divider" aria-hidden="true"></span>
+      <a class="contact-item" href="tel:+201044550893">
+        <i class="fas fa-envelope" aria-hidden="true"></i>
+        <span>+201044550893</span>
+      </a>
+    </div>
+    <div class="social-links" aria-label="Social media links">
+      <a class="social-item" href="#" aria-label="Facebook"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
+      <a class="social-item" href="#" aria-label="Twitter"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+      <a class="social-item" href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in" aria-hidden="true"></i></a>
+      <a class="social-item" href="#" aria-label="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+      <a class="social-item" href="#" aria-label="YouTube"><i class="fab fa-youtube" aria-hidden="true"></i></a>
+    </div>
+  </div>
 
   <div class="back-wrap">
     <a href="course-content-math-est-1.html" class="back-btn" id="backToCourseContent">
@@ -328,7 +661,7 @@
               <button class="mini-reader-close" type="button" onclick="closeMiniReader()" aria-label="Close viewer">&times;</button>
             </div>
           </div>
-          <div id="miniReaderMessage" style="display: none; padding: 20px; text-align: center; color: #174389; font-weight: 600;">
+          <div id="miniReaderMessage" style="display: none; padding: 20px; text-align: center; color: #f5c400; font-weight: 600;">
             No preview link added yet.
           </div>
           <iframe id="miniReaderFrame" class="mini-reader-frame" src="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
@@ -568,6 +901,29 @@
       }
     }
 
+    function getModuleBadgeType(resource, category) {
+      var title = ((resource && resource.title) || '').toLowerCase();
+
+      if (title.indexOf('overview') !== -1) return 'overview';
+      if (title.indexOf('assignment') !== -1 || title.indexOf('homework') !== -1) return 'assignment';
+      if (title.indexOf('quiz') !== -1 || title.indexOf('exam') !== -1 || category === 'quizzes') return 'quiz';
+      if (title.indexOf('video') !== -1 || title.indexOf('lesson') !== -1) return 'video';
+      if (category === 'pdfs' || category === 'materials' || title.indexOf('pdf') !== -1 || title.indexOf('material') !== -1) return 'pdf';
+
+      return 'video';
+    }
+
+    function getModuleBadgeLabel(type) {
+      var labels = {
+        overview: 'Overview',
+        assignment: 'Assignment',
+        video: 'Lesson',
+        quiz: 'Quiz',
+        pdf: 'Material'
+      };
+      return labels[type] || 'Module';
+    }
+
     function renderResourceList(category) {
       var listEl = document.getElementById(category + 'List');
       if (!listEl) return;
@@ -577,7 +933,11 @@
       (lessonConfig.resources[category] || []).forEach(function(resource) {
         var item = document.createElement('li');
         var button = document.createElement('button');
+        var mainWrap = document.createElement('span');
         var icon = document.createElement('i');
+        var titleText = document.createElement('span');
+        var badge = document.createElement('span');
+        var badgeType = getModuleBadgeType(resource, category);
 
         button.className = 'resource-btn';
         button.type = 'button';
@@ -585,9 +945,18 @@
         button.setAttribute('data-type', resource.type);
         button.setAttribute('data-link-key', resource.linkKey);
 
+        mainWrap.className = 'resource-main';
         icon.className = resource.icon;
-        button.appendChild(icon);
-        button.appendChild(document.createTextNode(' ' + resource.title));
+        titleText.className = 'resource-title';
+        titleText.textContent = resource.title;
+
+        badge.className = 'module-badge ' + badgeType;
+        badge.textContent = getModuleBadgeLabel(badgeType);
+
+        mainWrap.appendChild(icon);
+        mainWrap.appendChild(titleText);
+        button.appendChild(mainWrap);
+        button.appendChild(badge);
         button.addEventListener('click', function() {
           openResourceMiniWindow(resource);
         });
